@@ -50,11 +50,6 @@ app.use(cors(corsOptions));
 
 app.use(flash());
 
-// 나중에 필요할지도 모르는 코드 두 줄
-//app.use("/uploads", express.static("uploads")); // uploads 폴더를 노출시킴
-// app.use("/static", express.static("assets"));
-
-// app.use(localMiddleware);
 app.use(
   "/images",
   express.static(path.join(__dirname, "../uploads")),
