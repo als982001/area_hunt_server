@@ -18,7 +18,7 @@ export const home = async (req, res) => {
 };
 
 export const getAllAreas = async (req, res) => {
-  const places = new Place.find();
+  const places = await Place.find();
 
   return res.status(codes.ok).json(places);
 };
