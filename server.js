@@ -42,7 +42,10 @@ app.use(logger);
 app.use(cookieParser());
 
 const corsOptions = {
-  origin: "http://localhost:3000",
+  origin: [
+    "http://localhost:3000",
+    "http://areahunt.s3-website.ap-northeast-2.amazonaws.com/",
+  ],
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   credentials: true,
 };
