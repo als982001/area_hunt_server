@@ -1,4 +1,3 @@
-import { dummyAreas, dummyVisitRecords } from "../datas/dummyData";
 import path from "path";
 import Account from "../models/Account";
 import Place from "../models/Place";
@@ -116,7 +115,6 @@ export const postVisitReviews = async (req, res) => {
 export const getItemsByKeyword = async (req, res) => {
   const { keyword } = req.query;
 
-  // const result = dummyAreas.filter((item) => item.name.includes(keyword));
   const result = await Place.find({
     name: {
       $regex: new RegExp(keyword, "i"),
@@ -124,4 +122,33 @@ export const getItemsByKeyword = async (req, res) => {
   });
 
   return res.status(codes.ok).json(result);
+};
+
+export const deleteReview = async (req, res) => {
+  const { _id } = req.query;
+
+  console.log(_id);
+
+  try {
+    const review = await Review.findById(_id);
+
+    if (review === null) {
+      return res.status(codes.noContent).json("id에 해당하는 댓글이 없습니다.");
+    }
+
+    const place = await Place.findById(review.placeId);
+
+    // 먼저 리뷰를 삭제합니다.
+    await Review.deleteOne({ _id: review._id });
+
+    // 그 후에 이 리뷰의 참조를 해당 장소의 reviews 배열에서 제거합니다.
+    await Place.updateOne(
+      { _id: place._id },
+      { $pull: { reviews: review._id } }
+    );
+  } catch (error) {
+    return res.status(codes.forbidden).json("id 형식이 올바르지 않습니다.");
+  }
+
+  return res.status(codes.noContent).end();
 };

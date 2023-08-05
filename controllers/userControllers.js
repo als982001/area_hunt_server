@@ -1,6 +1,5 @@
 import axios from "axios";
 import Account from "../models/Account";
-import { dummyAccounts } from "../datas/dummyAccounts";
 import { generateToken, verifyToken } from "./helper/tokenFunctions";
 require("dotenv").config();
 
@@ -56,6 +55,9 @@ export const login = async (req, res) => {
 export const logout = (req, res) => {
   const { cookies } = req;
   const refreshToken = cookies.refresh_jwt;
+
+  console.log(cookies);
+  console.log(refreshToken);
 
   if (refreshToken) {
     res.clearCookie("refresh_jwt", cookieOption);
@@ -124,6 +126,7 @@ export const join = async (req, res) => {
   res.status(codes.ok).end();
 };
 
+/*
 export const kakaoLogin = async (req, res) => {
   const { KAKAO_CODE } = req.body;
 
@@ -183,3 +186,4 @@ export const kakaoLogin = async (req, res) => {
     return res.status(401).send("Not Authorized");
   }
 };
+*/
