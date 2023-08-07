@@ -7,6 +7,8 @@ const accountSchema = new mongoose.Schema({
   password: { type: String, required: true },
   phone: { type: String, required: true },
   email: { type: String, required: true },
+  places: [{ type: mongoose.Schema.Types.ObjectId, ref: "Place" }],
+  reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: "Review" }],
 });
 
 const Account = mongoose.model("Account", accountSchema);

@@ -6,6 +6,7 @@ import {
   getItemsByAddress,
   postItem,
   updateItem,
+  removePlace,
 } from "../../controllers/itemControllers";
 import { uploadFiles } from "../middlewares";
 
@@ -13,6 +14,7 @@ const itemRouter = express.Router();
 
 itemRouter.get("/address/:address", getItemsByAddress);
 itemRouter.get("/search", getItemsByKeyword);
+itemRouter.delete("/delete", removePlace);
 itemRouter
   .route("/:id")
   .get(getItem)

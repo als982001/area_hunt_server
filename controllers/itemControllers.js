@@ -66,11 +66,45 @@ export const postItem = async (req, res) => {
   const place = new Place(req.body);
 
   try {
+    const publisher = await Account.findOne({ userId: place.publisherId });
+
+    if (publisher === null) {
+      return res.status(codes.forbidden).json("등록자 계정이 잘못되었습니다.");
+    }
+
     const newPlace = await place.save();
+
+    publisher.places.push(newPlace._id);
+    publisher.save();
 
     return res.status(codes.ok).end();
   } catch (error) {
     return res.status(400).send("Error");
+  }
+};
+
+export const removePlace = async (req, res) => {
+  const { id } = req.query;
+
+  try {
+    const place = await Place.findById(id);
+
+    if (place === null) {
+      return res.status(codes.badRequest).json("Error");
+    }
+
+    const publisher = await Account.findOne({ userId: place.publisherId });
+
+    await Account.updateOne(
+      { _id: publisher._id },
+      { $pull: { places: place._id } }
+    );
+
+    await Place.deleteOne({ _id: place._id });
+
+    return res.status(codes.ok).json("삭제 완료");
+  } catch (error) {
+    return res.status(codes.badRequest).json("Error");
   }
 };
 
@@ -124,10 +158,24 @@ export const getItemsByKeyword = async (req, res) => {
   return res.status(codes.ok).json(result);
 };
 
+export const updateReview = async (req, res) => {
+  const { id } = req.params;
+
+  const updatedReview = req.body;
+
+  const review = await Review.exists({ _id: id });
+
+  if (!review) {
+    return res.status(codes.badRequest).json("데이터를 찾을 수 없습니다.");
+  }
+
+  await Review.findByIdAndUpdate(id, updateReview);
+
+  return res.status(codes.ok).json("수정 완료");
+};
+
 export const deleteReview = async (req, res) => {
   const { _id } = req.query;
-
-  console.log(_id);
 
   try {
     const review = await Review.findById(_id);

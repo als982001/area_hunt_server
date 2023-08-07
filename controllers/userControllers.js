@@ -1,6 +1,7 @@
 import axios from "axios";
 import Account from "../models/Account";
 import { generateToken, verifyToken } from "./helper/tokenFunctions";
+import bcrypt from "bcrypt";
 require("dotenv").config();
 
 const ACCESS = "access";
@@ -33,11 +34,19 @@ const refreshCookieOption = {
 };
 
 export const login = async (req, res) => {
-  const { userId, password } = req.body;
+  let { userId, password } = req.body;
 
-  const account = await Account.findOne({ userId, password });
+  const account = await Account.findOne({ userId });
 
   if (account) {
+    console.log(account);
+
+    const validPassword = await bcrypt.compare(password, account.password);
+
+    if (validPassword === false) {
+      return res.status(codes.unauthorized).send("Not Authorized");
+    }
+
     const { accessToken, refreshToken } = generateToken(
       { id: account.userId, email: account.email },
       true
@@ -112,6 +121,9 @@ export const checkUserInfo = async (req, res) => {
 
 export const join = async (req, res) => {
   const newAccount = req.body;
+
+  const hash = await bcrypt.hash(newAccount.password, 10);
+  newAccount.password = hash;
 
   const account = await Account.exists({
     $or: [{ userId: newAccount.userId }, { email: newAccount.email }],
