@@ -94,13 +94,23 @@ export const checkUserInfo = async (req, res) => {
   const refreshToken = cookies.refresh_jwt;
   const accessPayload = verifyToken(ACCESS, accessToken);
 
+  console.log("=== accessToken, refreshToken, accessPayload ===");
+
   console.log(`accessToken: ${accessToken}`);
   console.log(`refreshToken: ${refreshToken}`);
+  console.log(accessPayload);
+  console.log("==========");
 
   if (accessPayload) {
+    console.log("Accesss Payload!!!");
+
     const { id } = accessPayload;
 
+    console.log(id);
+
     const userInfo = await Account.findOne({ userId: id });
+
+    console.log(userInfo);
 
     if (userInfo) {
       const checkedUserInfo = { ...userInfo.toObject() };
@@ -111,7 +121,11 @@ export const checkUserInfo = async (req, res) => {
       return res.status(401).send("Not Authorized");
     }
   } else if (refreshToken) {
+    console.log("Refresh Token!!!");
+
     const refreshPayload = verifyToken(REFRESH, refreshToken);
+
+    console.log(refreshPayload);
 
     if (!refreshPayload) {
       return res.status(401).send("Not Authorized");
@@ -129,6 +143,8 @@ export const checkUserInfo = async (req, res) => {
 
     return res.json(checkedUserInfo);
   }
+
+  console.log("헉!");
 
   return res.status(401).send("Not Authorized");
 };
