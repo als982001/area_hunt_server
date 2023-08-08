@@ -27,15 +27,11 @@ app.use(
     secret: "secret", // 쿠키에 sign 할 때 사용하는 string
     resave: false,
     saveUninitialized: true, // 세션이 새로 만들어지고 수정된 적이 없을 때 => uninitialized
-    /* cookie: {
+    cookie: {
       domain: "localhost",
       path: "/",
       httpOnly: true,
-    }, */
-    cookie: {
-      domain: "port-0-area-hunt-server-3prof2llkv5jeaa.sel4.cloudtype.app",
-      path: "/",
-      httpOnly: true,
+      secure: true,
     },
 
     // store: MongoStore.create({ mongoUrl: process.env.DB_URL }),
