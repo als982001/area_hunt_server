@@ -28,7 +28,8 @@ app.use(
     resave: false,
     saveUninitialized: true, // 세션이 새로 만들어지고 수정된 적이 없을 때 => uninitialized
     cookie: {
-      domain: "localhost",
+      domain:
+        "https://port-0-area-hunt-server-3prof2llkv5jeaa.sel4.cloudtype.app",
       path: "/",
       httpOnly: true,
       secure: true,
