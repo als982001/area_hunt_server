@@ -90,6 +90,10 @@ export const checkUserInfo = async (req, res) => {
 
   console.log(cookies);
 
+  if (cookies === null) {
+    return res.status(codes.badRequest).json("쿠키 없음");
+  }
+
   const accessToken = cookies.access_jwt;
   const refreshToken = cookies.refresh_jwt;
   const accessPayload = verifyToken(ACCESS, accessToken);
