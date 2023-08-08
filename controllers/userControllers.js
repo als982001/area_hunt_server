@@ -43,6 +43,8 @@ export const login = async (req, res) => {
 
     const validPassword = await bcrypt.compare(password, account.password);
 
+    console.log(`validPassword: ${validPassword}`);
+
     if (validPassword === false) {
       return res.status(codes.unauthorized).send("Not Authorized");
     }
@@ -51,6 +53,9 @@ export const login = async (req, res) => {
       { id: account.userId, email: account.email },
       true
     );
+
+    console.log(`accessToken: ${accessToken}`);
+    console.log(`refreshToken: ${refreshToken}`);
 
     res.cookie("refresh_jwt", refreshToken, refreshCookieOption);
     res.cookie("access_jwt", accessToken, cookieOption);
@@ -77,11 +82,18 @@ export const logout = (req, res) => {
 };
 
 export const checkUserInfo = async (req, res) => {
+  console.log("Check User Info!!!");
+
   const { cookies } = req;
+
+  console.log(cookies);
 
   const accessToken = cookies.access_jwt;
   const refreshToken = cookies.refresh_jwt;
   const accessPayload = verifyToken(ACCESS, accessToken);
+
+  console.log(`accessToken: ${accessToken}`);
+  console.log(`refreshToken: ${refreshToken}`);
 
   if (accessPayload) {
     const { id } = accessPayload;
