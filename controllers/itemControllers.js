@@ -169,7 +169,7 @@ export const updateReview = async (req, res) => {
     return res.status(codes.badRequest).json("데이터를 찾을 수 없습니다.");
   }
 
-  await Review.findByIdAndUpdate(id, updateReview);
+  await Review.findByIdAndUpdate(id, updatedReview);
 
   return res.status(codes.ok).json("수정 완료");
 };
