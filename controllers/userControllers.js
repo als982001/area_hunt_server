@@ -86,8 +86,6 @@ export const logout = (req, res) => {
 export const checkUserInfo = async (req, res) => {
   console.log("Check User Info!!!");
 
-  console.log(req);
-
   const { cookies } = req;
 
   console.log(cookies);

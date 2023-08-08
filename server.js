@@ -33,7 +33,7 @@ app.use(
       httpOnly: true,
     }, */
     cookie: {
-      domain: "testtesttest.com",
+      domain: "port-0-area-hunt-server-3prof2llkv5jeaa.sel4.cloudtype.app",
       path: "/",
       httpOnly: true,
       secure: true,
