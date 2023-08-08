@@ -49,6 +49,8 @@ export const login = async (req, res) => {
       return res.status(codes.unauthorized).send("Not Authorized");
     }
 
+    console.log("비밀번호 맞음!!!");
+
     const { accessToken, refreshToken } = generateToken(
       { id: account.userId, email: account.email },
       true
