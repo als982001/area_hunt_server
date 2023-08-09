@@ -28,8 +28,7 @@ app.use(
     resave: false,
     saveUninitialized: true, // 세션이 새로 만들어지고 수정된 적이 없을 때 => uninitialized
     cookie: {
-      domain:
-        "https://port-0-area-hunt-server-3prof2llkv5jeaa.sel4.cloudtype.app",
+      domain: "port-0-area-hunt-server-3prof2llkv5jeaa.sel4.cloudtype.app",
       path: "/",
       httpOnly: true,
       secure: true,
@@ -45,9 +44,13 @@ app.use(logger);
 app.use(cookieParser());
 
 const corsOptions = {
-  origin: "http://localhost:3000",
+  origin: [
+    "http://localhost:3000",
+    "http://areahunt.s3-website.ap-northeast-2.amazonaws.com",
+  ],
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   credentials: true,
+  sameSite: "none",
 };
 app.use(cors(corsOptions));
 
