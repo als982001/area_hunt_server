@@ -58,6 +58,27 @@ export const login = async (req, res) => {
 
     console.log(`accessToken: ${accessToken}`);
     console.log(`refreshToken: ${refreshToken}`);
+    console.log(req.headers.origin);
+
+    // 도메인 설정
+    let cookieDomain;
+    if (req.headers.origin === "http://localhost:3000") {
+      cookieDomain = "localhost"; // 테스트 환경
+    } else if (
+      req.headers.origin ===
+      "http://area-hunt.s3-website.ap-northeast-2.amazonaws.com"
+    ) {
+      cookieDomain = "area-hunt.s3-website.ap-northeast-2.amazonaws.com"; // 실제 배포 환경
+    }
+
+    res.cookie("refresh_jwt", refreshToken, {
+      ...refreshCookieOption,
+      domain: cookieDomain,
+    });
+    res.cookie("access_jwt", accessToken, {
+      ...cookieOption,
+      domain: cookieDomain,
+    });
 
     res.cookie("refresh_jwt", refreshToken, refreshCookieOption);
     res.cookie("access_jwt", accessToken, cookieOption);
