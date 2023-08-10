@@ -39,26 +39,16 @@ export const login = async (req, res) => {
   const account = await Account.findOne({ userId });
 
   if (account) {
-    console.log(account);
-
     const validPassword = await bcrypt.compare(password, account.password);
-
-    console.log(`validPassword: ${validPassword}`);
 
     if (validPassword === false) {
       return res.status(codes.unauthorized).send("Not Authorized");
     }
 
-    console.log("비밀번호 맞음!!!");
-
     const { accessToken, refreshToken } = generateToken(
       { id: account.userId, email: account.email },
       true
     );
-
-    console.log(`accessToken: ${accessToken}`);
-    console.log(`refreshToken: ${refreshToken}`);
-    console.log(req.headers.origin);
 
     // 도메인 설정
     let cookieDomain;
@@ -98,9 +88,6 @@ export const logout = (req, res) => {
   const { cookies } = req;
   const refreshToken = cookies.refresh_jwt;
 
-  console.log(cookies);
-  console.log(refreshToken);
-
   if (refreshToken) {
     res.clearCookie("refresh_jwt", cookieOption);
   }
@@ -110,11 +97,12 @@ export const logout = (req, res) => {
 };
 
 export const checkUserInfo = async (req, res) => {
-  console.log("Check User Info!!!");
-
   const { cookies } = req;
 
   console.log(cookies);
+
+  console.log(res.cookie);
+  console.log(res.cookies);
 
   if (cookies === null) {
     return res.status(codes.badRequest).json("쿠키 없음");
@@ -124,23 +112,10 @@ export const checkUserInfo = async (req, res) => {
   const refreshToken = cookies.refresh_jwt;
   const accessPayload = verifyToken(ACCESS, accessToken);
 
-  console.log("=== accessToken, refreshToken, accessPayload ===");
-
-  console.log(`accessToken: ${accessToken}`);
-  console.log(`refreshToken: ${refreshToken}`);
-  console.log(accessPayload);
-  console.log("==========");
-
   if (accessPayload) {
-    console.log("Accesss Payload!!!");
-
     const { id } = accessPayload;
 
-    console.log(id);
-
     const userInfo = await Account.findOne({ userId: id });
-
-    console.log(userInfo);
 
     if (userInfo) {
       const checkedUserInfo = { ...userInfo.toObject() };
@@ -151,11 +126,7 @@ export const checkUserInfo = async (req, res) => {
       return res.status(401).send("Not Authorized");
     }
   } else if (refreshToken) {
-    console.log("Refresh Token!!!");
-
     const refreshPayload = verifyToken(REFRESH, refreshToken);
-
-    console.log(refreshPayload);
 
     if (!refreshPayload) {
       return res.status(401).send("Not Authorized");
@@ -173,8 +144,6 @@ export const checkUserInfo = async (req, res) => {
 
     return res.json(checkedUserInfo);
   }
-
-  console.log("헉!");
 
   return res.status(401).send("Not Authorized");
 };
