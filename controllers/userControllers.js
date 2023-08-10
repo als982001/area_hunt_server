@@ -41,8 +41,7 @@ export const login = async (req, res) => {
   if (account) {
     console.log(account);
 
-    // const validPassword = await bcrypt.compare(password, account.password);
-    const validPassword = account.password === password;
+    const validPassword = await bcrypt.compare(password, account.password);
 
     console.log(`validPassword: ${validPassword}`);
 
@@ -81,8 +80,13 @@ export const login = async (req, res) => {
       domain: cookieDomain,
     });
 
-    res.cookie("refresh_jwt", refreshToken, refreshCookieOption);
-    res.cookie("access_jwt", accessToken, cookieOption);
+    console.log({
+      ...cookieOption,
+      domain: cookieDomain,
+    });
+
+    // res.cookie("refresh_jwt", refreshToken, refreshCookieOption);
+    // res.cookie("access_jwt", accessToken, cookieOption);
 
     res.redirect("userInfo");
   } else {
@@ -178,8 +182,8 @@ export const checkUserInfo = async (req, res) => {
 export const join = async (req, res) => {
   const newAccount = req.body;
 
-  // const hash = await bcrypt.hash(newAccount.password, 10);
-  // newAccount.password = hash;
+  const hash = await bcrypt.hash(newAccount.password, 10);
+  newAccount.password = hash;
 
   const account = await Account.exists({
     $or: [{ userId: newAccount.userId }, { email: newAccount.email }],
