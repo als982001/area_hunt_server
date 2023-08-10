@@ -17,7 +17,7 @@ const codes = {
 };
 
 const cookieOption = {
-  domain: "localhost:3000",
+  domain: "http://localhost:3000",
   path: "/",
   httpOnly: true,
   sameSite: "none",
@@ -25,7 +25,7 @@ const cookieOption = {
 };
 
 const refreshCookieOption = {
-  domain: "localhost:3000",
+  domain: "http://localhost:3000",
   path: "/",
   httpOnly: true,
   sameSite: "none",
