@@ -70,11 +70,6 @@ export const login = async (req, res) => {
       domain: cookieDomain,
     });
 
-    console.log({
-      ...cookieOption,
-      domain: cookieDomain,
-    });
-
     // res.cookie("refresh_jwt", refreshToken, refreshCookieOption);
     // res.cookie("access_jwt", accessToken, cookieOption);
 
@@ -98,11 +93,6 @@ export const logout = (req, res) => {
 
 export const checkUserInfo = async (req, res) => {
   const { cookies } = req;
-
-  console.log(cookies);
-
-  console.log(res.cookie);
-  console.log(res.cookies);
 
   if (cookies === null) {
     return res.status(codes.badRequest).json("쿠키 없음");
