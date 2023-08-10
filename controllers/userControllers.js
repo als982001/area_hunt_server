@@ -17,7 +17,7 @@ const codes = {
 };
 
 const cookieOption = {
-  domain: "localhost",
+  domain: "area-hunt.s3-website.ap-northeast-2.amazonaws.com/",
   path: "/",
   httpOnly: true,
   sameSite: "none",
@@ -25,7 +25,7 @@ const cookieOption = {
 };
 
 const refreshCookieOption = {
-  domain: "localhost",
+  domain: "area-hunt.s3-website.ap-northeast-2.amazonaws.com/",
   path: "/",
   httpOnly: true,
   sameSite: "none",
