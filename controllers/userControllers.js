@@ -17,6 +17,7 @@ const codes = {
 };
 
 const cookieOption = {
+  domain: "localhost:3000",
   path: "/",
   httpOnly: true,
   sameSite: "none",
@@ -24,6 +25,7 @@ const cookieOption = {
 };
 
 const refreshCookieOption = {
+  domain: "localhost:3000",
   path: "/",
   httpOnly: true,
   sameSite: "none",
@@ -49,13 +51,13 @@ export const login = async (req, res) => {
     );
 
     if (
-      req.headers.origin === "http://localhost:3000" ||
-      req.headers.origin ===
-        "http://area-hunt.s3-website.ap-northeast-2.amazonaws.com"
+      !(
+        req.headers.origin === "http://localhost:3000" ||
+        req.headers.origin ===
+          "http://area-hunt.s3-website.ap-northeast-2.amazonaws.com"
+      )
     ) {
-      console.log("Safe!");
-    } else {
-      console.log("이거는 뭐지");
+      return res.status(codes.forbidden).json("잘못된 요청입니다.");
     }
 
     res.cookie("refresh_jwt", refreshToken, refreshCookieOption);
