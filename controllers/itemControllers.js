@@ -47,6 +47,28 @@ export const getItem = async (req, res) => {
   }
 };
 
+export const getPlacesByUser = async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const user = await Account.findById(userId);
+
+    if (user === null) {
+      return res.status(codes.badRequest).json("잘못된 요청");
+    }
+
+    const places = await Place.find({
+      _id: { $in: user.places },
+    });
+
+    return res.status(codes.ok).json(places);
+  } catch (error) {
+    console.log(error);
+
+    return res.status(codes.badRequest).json("잘못된 요청");
+  }
+};
+
 export const updateItem = async (req, res) => {
   const { id } = req.params;
   const updatedPlace = req.body;
@@ -117,6 +139,32 @@ export const getVisitReviews = async (req, res) => {
     return res.status(codes.ok).json(reviews);
   } else {
     return res.status(codes.notFound).end();
+  }
+};
+
+export const getReviewsByUser = async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const user = await Account.findById(userId);
+
+    console.log(user);
+
+    if (user === null) {
+      return res.status(codes.badRequest).json("잘못된 요청");
+    }
+
+    const reviews = await Review.find({
+      _id: { $in: user.reviews },
+    });
+
+    console.log(reviews);
+
+    return res.status(codes.ok).json(reviews);
+  } catch (error) {
+    console.log(error);
+
+    return res.status(codes.badRequest).json("잘못된 요청");
   }
 };
 

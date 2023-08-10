@@ -82,8 +82,6 @@ export const logout = (req, res) => {
 export const checkUserInfo = async (req, res) => {
   const { cookies } = req;
 
-  console.log(cookies);
-
   if (cookies === null) {
     return res.status(codes.badRequest).json("쿠키 없음");
   }
@@ -133,6 +131,8 @@ export const join = async (req, res) => {
 
   const hash = await bcrypt.hash(newAccount.password, 10);
   newAccount.password = hash;
+
+  newAccount.role = "user";
 
   const account = await Account.exists({
     $or: [{ userId: newAccount.userId }, { email: newAccount.email }],
