@@ -21,7 +21,6 @@ const cookieOption = {
   path: "/",
   httpOnly: true,
   sameSite: "none",
-  secure: true,
 };
 
 const refreshCookieOption = {
@@ -29,7 +28,7 @@ const refreshCookieOption = {
   path: "/",
   httpOnly: true,
   sameSite: "none",
-  secure: true,
+
   expires: new Date(Date.now() + 24 * 3600 * 1000 * 7),
 };
 
