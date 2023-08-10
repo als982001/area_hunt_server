@@ -17,7 +17,6 @@ const codes = {
 };
 
 const cookieOption = {
-  domain: "localhost",
   path: "/",
   httpOnly: true,
   sameSite: "none",
@@ -25,7 +24,6 @@ const cookieOption = {
 };
 
 const refreshCookieOption = {
-  domain: "localhost",
   path: "/",
   httpOnly: true,
   sameSite: "none",
@@ -50,6 +48,7 @@ export const login = async (req, res) => {
       true
     );
 
+    /*
     // 도메인 설정
     let cookieDomain;
     if (req.headers.origin === "http://localhost:3000") {
@@ -69,9 +68,10 @@ export const login = async (req, res) => {
       ...cookieOption,
       domain: cookieDomain,
     });
+    */
 
-    // res.cookie("refresh_jwt", refreshToken, refreshCookieOption);
-    // res.cookie("access_jwt", accessToken, cookieOption);
+    res.cookie("refresh_jwt", refreshToken, refreshCookieOption);
+    res.cookie("access_jwt", accessToken, cookieOption);
 
     res.redirect("userInfo");
   } else {
