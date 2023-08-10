@@ -94,6 +94,8 @@ export const logout = (req, res) => {
 export const checkUserInfo = async (req, res) => {
   const { cookies } = req;
 
+  console.log(cookies);
+
   if (cookies === null) {
     return res.status(codes.badRequest).json("쿠키 없음");
   }
