@@ -12,37 +12,34 @@ const codes = {
   notFound: 404,
 };
 
-export const home = async (req, res) => {
-  return res.status(codes.ok).end();
-};
-
-export const getAllAreas = async (req, res) => {
+export const getAllPlaces = async (req, res) => {
   const places = await Place.find();
 
   return res.status(codes.ok).json(places);
 };
 
-export const getItemsByAddress = async (req, res) => {
+export const getPlacesByAddress = async (req, res) => {
   const { address } = req.params;
+
+  console.log(address);
 
   const places = await Place.find({ address: new RegExp(address, "i") });
 
   return res.status(codes.ok).json(places);
 };
 
-export const getItem = async (req, res) => {
+export const getPlace = async (req, res) => {
   const { id } = req.params;
 
   try {
     const place = await Place.findById(id);
 
-    if (place) {
-      return res.status(codes.ok).json(place);
-    } else {
-      return res.status(codes.notFound).end();
+    if (place === null) {
+      return res.status(codes.notFound).json("장소를 찾을 수 없습니다.");
     }
+
+    return res.status(codes.ok).json(place);
   } catch (error) {
-    console.log(error);
     return res.status(codes.badRequest).end();
   }
 };
@@ -63,15 +60,13 @@ export const getPlacesByUser = async (req, res) => {
 
     return res.status(codes.ok).json(places);
   } catch (error) {
-    console.log(error);
-
     return res.status(codes.badRequest).json("잘못된 요청");
   }
 };
 
-export const updateItem = async (req, res) => {
+export const updatePlace = async (req, res) => {
   const { id } = req.params;
-  const updatedPlace = req.body;
+  const { updatedPlace, userId } = req.body;
 
   const place = await Place.exists({ _id: updatedPlace._id });
 
@@ -79,18 +74,27 @@ export const updateItem = async (req, res) => {
     return res.status(codes.forbidden).send("데이터를 찾을 수 없습니다.");
   }
 
+  if (userId !== place.publisherId) {
+    return res.status(codes.forbidden).send("수정할 수 없습니다.");
+  }
+
   await Place.findByIdAndUpdate(updatedPlace._id, updatedPlace);
 
   return res.status(200).end();
 };
 
-export const postItem = async (req, res) => {
-  const place = new Place(req.body);
+export const postPlace = async (req, res) => {
+  let { place, publisherId } = req.body;
+
+  publisherId = mongoose.Types.ObjectId(publisherId);
+  place.publisherId = publisherId;
+
+  place = new Place(place);
 
   try {
-    const publisher = await Account.findOne({ userId: place.publisherId });
+    const publisher = await Account.findOne({ _id: publisherId });
 
-    if (publisher === null) {
+    if (!publisher) {
       return res.status(codes.forbidden).json("등록자 계정이 잘못되었습니다.");
     }
 
@@ -105,17 +109,21 @@ export const postItem = async (req, res) => {
   }
 };
 
-export const removePlace = async (req, res) => {
-  const { id } = req.query;
+export const deletePlace = async (req, res) => {
+  const { id, userId } = req.query;
 
   try {
     const place = await Place.findById(id);
 
-    if (place === null) {
-      return res.status(codes.badRequest).json("Error");
+    if (!place) {
+      return res.status(codes.badRequest).json("해당 장소를 찾을 수 없습니다.");
     }
 
     const publisher = await Account.findOne({ userId: place.publisherId });
+
+    if (publisher._id.toString() !== userId) {
+      return res.status(codes.forbidden).json("삭제할 수 없습니다.");
+    }
 
     await Account.updateOne(
       { _id: publisher._id },
@@ -130,7 +138,7 @@ export const removePlace = async (req, res) => {
   }
 };
 
-export const getVisitReviews = async (req, res) => {
+export const getReviews = async (req, res) => {
   const { id } = req.params;
 
   const reviews = await Review.find({ placeId: new ObjectId(id) });
@@ -148,7 +156,7 @@ export const getReviewsByUser = async (req, res) => {
   try {
     const user = await Account.findById(userId);
 
-    if (user === null) {
+    if (!user) {
       return res.status(codes.badRequest).json("잘못된 요청");
     }
 
@@ -164,7 +172,7 @@ export const getReviewsByUser = async (req, res) => {
   }
 };
 
-export const postVisitReviews = async (req, res) => {
+export const postReviews = async (req, res) => {
   const { placeId, userId } = req.query;
 
   try {
@@ -201,8 +209,8 @@ export const postVisitReviews = async (req, res) => {
   }
 };
 
-export const getItemsByKeyword = async (req, res) => {
-  const { keyword } = req.query;
+export const getPlacesByKeyword = async (req, res) => {
+  const { keyword } = req.params;
 
   const result = await Place.find({
     name: {
@@ -215,13 +223,16 @@ export const getItemsByKeyword = async (req, res) => {
 
 export const updateReview = async (req, res) => {
   const { id } = req.params;
-
-  const updatedReview = req.body;
+  const { updatedReview, userId } = req.body;
 
   const review = await Review.exists({ _id: id });
 
   if (!review) {
     return res.status(codes.badRequest).json("데이터를 찾을 수 없습니다.");
+  }
+
+  if (review.reviewerId.toString() !== userId) {
+    return res.status(codes.forbidden).json("변경할 수 없습니다.");
   }
 
   await Review.findByIdAndUpdate(id, updatedReview);
@@ -230,13 +241,17 @@ export const updateReview = async (req, res) => {
 };
 
 export const deleteReview = async (req, res) => {
-  const { _id } = req.params;
+  const { id, userId } = req.query;
 
   try {
-    const review = await Review.findById(_id);
+    const review = await Review.findById(id);
 
     if (review === null) {
       return res.status(codes.noContent).json("id에 해당하는 댓글이 없습니다.");
+    }
+
+    if (review.reviewerId.toString() !== userId) {
+      return res.status(codes.forbidden).json("삭제할 수 없습니다.");
     }
 
     const place = await Place.findById(review.placeId);

@@ -3,18 +3,18 @@ import multer from "multer";
 import {
   deleteReview,
   getReviewsByUser,
-  getVisitReviews,
-  postVisitReviews,
+  getReviews,
+  postReviews,
   updateReview,
 } from "../../controllers/itemControllers";
 import { uploadFiles } from "../middlewares";
 
 const reviewRouter = express.Router();
 
-reviewRouter.delete("/delete/:_id", deleteReview);
+reviewRouter.delete("/delete", deleteReview);
 reviewRouter.get("/user/:userId", getReviewsByUser);
-reviewRouter.get("/:id", getVisitReviews);
+reviewRouter.get("/:id", getReviews);
 reviewRouter.patch("/:id", updateReview);
-reviewRouter.post("/", uploadFiles.single("image"), postVisitReviews);
+reviewRouter.post("/", uploadFiles.single("image"), postReviews);
 
 export default reviewRouter;

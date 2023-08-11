@@ -6,7 +6,7 @@ const placeSchema = new mongoose.Schema({
   address: { type: String, required: true },
   location: { type: String, required: true },
   content: { type: String, required: true },
-  publisherId: { type: String, required: true },
+  publisherId: { type: mongoose.Schema.Types.ObjectId, ref: "Account" },
   reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: "Review" }],
 });
 

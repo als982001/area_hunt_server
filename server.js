@@ -9,10 +9,10 @@ import path from "path";
 import MongoStore from "connect-mongo";
 import rootRouter from "./src/routers/rootRouter";
 import userRouter from "./src/routers/userRouter";
-import itemRouter from "./src/routers/itemrouter";
 import reviewRouter from "./src/routers/reviewRouter";
 import { testPrint } from "./src/middlewares";
 import imageRouter from "./src/routers/imageRouter";
+import placeRouter from "./src/routers/placeRouter";
 
 const cookieParser = require("cookie-parser");
 
@@ -64,7 +64,7 @@ app.use(
 );
 
 app.use("/user", userRouter);
-app.use("/items", itemRouter);
+app.use("/place", placeRouter);
 app.use("/review", reviewRouter);
 app.use("/image", imageRouter);
 app.use("/uploads", express.static("uploads"));
