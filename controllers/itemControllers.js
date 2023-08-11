@@ -148,8 +148,6 @@ export const getReviewsByUser = async (req, res) => {
   try {
     const user = await Account.findById(userId);
 
-    console.log(user);
-
     if (user === null) {
       return res.status(codes.badRequest).json("잘못된 요청");
     }
@@ -157,8 +155,6 @@ export const getReviewsByUser = async (req, res) => {
     const reviews = await Review.find({
       _id: { $in: user.reviews },
     });
-
-    console.log(reviews);
 
     return res.status(codes.ok).json(reviews);
   } catch (error) {
@@ -169,26 +165,37 @@ export const getReviewsByUser = async (req, res) => {
 };
 
 export const postVisitReviews = async (req, res) => {
-  const { id } = req.params;
+  const { placeId, userId } = req.query;
 
   try {
-    const place = await Place.findById(id);
+    const place = await Place.findById(placeId);
+    const user = await Account.findById(userId);
 
-    if (place) {
-      const newReview = await Review.create({
-        placeId: new ObjectId(id),
-        ...req.body,
-      });
-
-      place.reviews.push(newReview._id);
-      place.save();
-
-      return res.status(codes.ok).end();
-    } else {
+    if (place === null) {
       return res
         .status(codes.notFound)
         .send("해당하는 장소를 찾을 수 없습니다.");
     }
+
+    if (user === null) {
+      return res
+        .status(codes.notFound)
+        .send("해당하는 유저를 찾을 수 없습니다.");
+    }
+
+    const newReview = await Review.create({
+      placeId: new ObjectId(placeId),
+      reviewerId: new ObjectId(userId),
+      ...req.body,
+    });
+
+    place.reviews.push(newReview._id);
+    place.save();
+
+    user.reviews.push(newReview._id);
+    user.save();
+
+    return res.status(codes.ok).end();
   } catch (error) {
     return res.status(400).send("Error");
   }
@@ -223,7 +230,7 @@ export const updateReview = async (req, res) => {
 };
 
 export const deleteReview = async (req, res) => {
-  const { _id } = req.query;
+  const { _id } = req.params;
 
   try {
     const review = await Review.findById(_id);

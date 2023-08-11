@@ -11,10 +11,10 @@ import { uploadFiles } from "../middlewares";
 
 const reviewRouter = express.Router();
 
-reviewRouter.delete("/delete", deleteReview);
+reviewRouter.delete("/delete/:_id", deleteReview);
 reviewRouter.get("/user/:userId", getReviewsByUser);
 reviewRouter.get("/:id", getVisitReviews);
 reviewRouter.patch("/:id", updateReview);
-reviewRouter.post("/:id", uploadFiles.single("image"), postVisitReviews);
+reviewRouter.post("/", uploadFiles.single("image"), postVisitReviews);
 
 export default reviewRouter;
