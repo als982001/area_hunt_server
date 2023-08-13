@@ -18,10 +18,22 @@ export const getAllPlaces = async (req, res) => {
   return res.status(codes.ok).json(places);
 };
 
+export const getPlacesFromIndex = async (req, res) => {
+  const { startIndex } = req.params;
+
+  const count = await Place.countDocuments();
+
+  if (startIndex >= count) {
+    return res.status(codes.noContent).json([]);
+  }
+
+  const places = await Place.find().skip(startIndex).limit(8);
+
+  return res.status(codes.ok).json(places);
+};
+
 export const getPlacesByAddress = async (req, res) => {
   const { address } = req.params;
-
-  console.log(address);
 
   const places = await Place.find({ address: new RegExp(address, "i") });
 
@@ -86,11 +98,6 @@ export const updatePlace = async (req, res) => {
 export const postPlace = async (req, res) => {
   let { place, publisherId } = req.body;
 
-  publisherId = mongoose.Types.ObjectId(publisherId);
-  place.publisherId = publisherId;
-
-  place = new Place(place);
-
   try {
     const publisher = await Account.findOne({ _id: publisherId });
 
@@ -98,7 +105,10 @@ export const postPlace = async (req, res) => {
       return res.status(codes.forbidden).json("등록자 계정이 잘못되었습니다.");
     }
 
-    const newPlace = await place.save();
+    const newPlace = await Place.create({
+      publisherId: new ObjectId(publisherId),
+      ...place,
+    });
 
     publisher.places.push(newPlace._id);
     publisher.save();
@@ -119,20 +129,23 @@ export const deletePlace = async (req, res) => {
       return res.status(codes.badRequest).json("해당 장소를 찾을 수 없습니다.");
     }
 
-    const publisher = await Account.findOne({ userId: place.publisherId });
+    // const publisher = await Account.findOne({ _id: place.publisherId });
+    const publisher = await Account.findById(place.publisherId);
 
-    if (publisher._id.toString() !== userId) {
+    const requester = await Account.findById(userId);
+
+    if (requester.role === "admin" || publisher._id.toString() === userId) {
+      await Account.updateOne(
+        { _id: publisher._id },
+        { $pull: { places: place._id } }
+      );
+
+      await Place.deleteOne({ _id: place._id });
+
+      return res.status(codes.ok).json("삭제 완료");
+    } else {
       return res.status(codes.forbidden).json("삭제할 수 없습니다.");
     }
-
-    await Account.updateOne(
-      { _id: publisher._id },
-      { $pull: { places: place._id } }
-    );
-
-    await Place.deleteOne({ _id: place._id });
-
-    return res.status(codes.ok).json("삭제 완료");
   } catch (error) {
     return res.status(codes.badRequest).json("Error");
   }
