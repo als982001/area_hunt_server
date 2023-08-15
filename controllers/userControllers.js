@@ -34,13 +34,15 @@ const refreshCookieOption = {
 export const login = async (req, res) => {
   let { userId, password } = req.body;
 
+  console.log(`userId: ${userId}, password: ${password}`);
+
   const account = await Account.findOne({ userId });
 
   if (account) {
     const validPassword = await bcrypt.compare(password, account.password);
 
     if (validPassword === false) {
-      return res.status(codes.unauthorized).send("Not Authorized");
+      return res.status(codes.badRequest).send("비밀번호가 일치하지 않습니다.");
     }
 
     const { accessToken, refreshToken } = generateToken(
@@ -48,6 +50,7 @@ export const login = async (req, res) => {
       true
     );
 
+    /*
     if (
       !(
         req.headers.origin === "http://localhost:3000" ||
@@ -57,13 +60,14 @@ export const login = async (req, res) => {
     ) {
       return res.status(codes.forbidden).json("잘못된 요청입니다.");
     }
+    */
 
     res.cookie("refresh_jwt", refreshToken, refreshCookieOption);
     res.cookie("access_jwt", accessToken, cookieOption);
 
     res.redirect("userInfo");
   } else {
-    return res.status(codes.unauthorized).send("Not Authorized");
+    return res.status(codes.notFound).json("ID에 해당하는 계정이 없습니다.");
   }
 };
 
@@ -76,14 +80,14 @@ export const logout = (req, res) => {
   }
   res.clearCookie("access_jwt", cookieOption);
 
-  return res.status(205).send("Logged Out Successfully");
+  return res.status(205).send("로그아웃이 성공적으로 완료되었습니다.");
 };
 
 export const checkUserInfo = async (req, res) => {
   const { cookies } = req;
 
   if (cookies === null) {
-    return res.status(codes.badRequest).json("쿠키 없음");
+    return res.status(codes.unauthorized).json("Not Authorized");
   }
 
   const accessToken = cookies.access_jwt;
@@ -120,7 +124,7 @@ export const checkUserInfo = async (req, res) => {
     const checkedUserInfo = { ...userInfo.toObject() };
     delete checkedUserInfo.password;
 
-    return res.json(checkedUserInfo);
+    return res.status(200).json(checkedUserInfo);
   }
 
   return res.status(401).send("Not Authorized");
@@ -144,7 +148,7 @@ export const join = async (req, res) => {
 
   await Account.create(newAccount);
 
-  res.status(codes.ok).end();
+  res.status(codes.ok).json("회원가입이 성공적으로 완료되었습니다.");
 };
 
 /*
